@@ -10,22 +10,28 @@ const App = () => {
   const [loggedInUserData, setLoggedInUserData] = useState(null)
   const [userData,SetUserData] = useContext(AuthContext)
 
-  useEffect(()=>{
-    const loggedInUser = localStorage.getItem('loggedInUser')
-    
-    if(loggedInUser){
-      const userData = JSON.parse(loggedInUser)
-      setUser(userData.role)
-      setLoggedInUserData(userData.data)
+  useEffect(() => {
+    const storedUser = localStorage.getItem('loggedInUser');
+  
+    if (storedUser) {
+      try {
+        const loggedInUser = JSON.parse(storedUser);
+        if (loggedInUser) {
+          setUser(loggedInUser.role || null);
+          setLoggedInUserData(loggedInUser.data || null);
+        }
+      } catch (error) {
+        console.error("Error parsing JSON from localStorage:", error);
+        localStorage.removeItem('loggedInUser'); // Remove corrupted data
+      }
     }
-
-  },[])
+  }, []);
 
 
   const handleLogin = (email, password) => {
-    if (email == 'admin@me.com' && password == '123') {
+    if (email == 'admin@example.com' && password == '123') {
       setUser('admin')
-      localStorage.setItem('loggedInUser', JSON.stringify({ role: 'admin' }))
+      localStorage.setItem('loggedInUser', JSON.stringify({ role: 'admin', data:null }))
     } else if (userData) {
       const employee = userData.find((e) => email == e.email && e.password == password)
       if (employee) {
@@ -44,7 +50,7 @@ const App = () => {
   return (
     <>
       {!user ? <Login handleLogin={handleLogin} /> : ''}
-      {user == 'admin' ? <AdminDashboard changeUser={setUser} /> : (user == 'employee' ? <EmployeeDashboard changeUser={setUser} data={loggedInUserData} /> : null) }
+      {user == 'admin' ? <AdminDashboard changeUser={setUser} /> : (user == 'employee' ? <EmployeeDashboard changeUser={setUser} data={loggedInUserData} setData={setLoggedInUserData} /> : null) }
     </>
   )
 }

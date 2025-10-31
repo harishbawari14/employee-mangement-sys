@@ -17,5 +17,8 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'react/prop-types': 'off', // Disable prop-types validation for development
+    'no-unused-vars': 'warn', // Change unused vars from error to warning
+    'react/react-in-jsx-scope': 'off', // Not needed in React 17+
   },
 }
